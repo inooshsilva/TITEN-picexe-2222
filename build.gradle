@@ -1,0 +1,72 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+}
+
+group = 'com.titanpickaxe'
+version = '1.0.0'
+
+base {
+    archivesName = 'TitanPickaxe'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                titanpickaxe {
+                    source sourceSets.main
+                }
+            }
+        }
+        client {}
+        server {
+            args '--nogui'
+        }
+    }
+}
+
+repositories {}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.4.20'
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+        minecraft_version: '1.20.1',
+        forge_version: '47.4.20',
+        mod_id: 'titanpickaxe',
+        mod_name: 'Titan Pickaxe',
+        mod_version: project.version,
+        mod_authors: 'TitanPickaxe',
+        mod_description: 'Adds a Titan Pickaxe that mines a 10x10 horizontal area.'
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+            'Specification-Title': 'Titan Pickaxe',
+            'Specification-Vendor': 'titanpickaxe',
+            'Specification-Version': '1',
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.jar.archiveVersion,
+            'Implementation-Vendor': 'titanpickaxe'
+        ])
+    }
+}
